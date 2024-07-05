@@ -19,7 +19,18 @@ export default function App() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.keyboardAvoidingContainer}
             >
-                <FlatList />
+                <View style={styles.botMessageContainer}>
+                    <Text>Bot Message</Text>
+                </View>
+                <View style={styles.userMessageContainer}>
+                    <Text>User Message</Text>
+                </View>
+                <View style={styles.userMessageContainer}>
+                    <Text>This setup ensures that messages are properly aligned on the left and right sides of the screen, creating a typical chat interface layout.</Text>
+                </View>
+                <View style={styles.botMessageContainer}>
+                    <Text>This setup ensures that messages are properly aligned on the left and right sides of the screen, creating a typical chat interface layout.</Text>
+                </View>
             </KeyboardAvoidingView>
         </View>
     );
@@ -29,7 +40,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#212121",
-        alignItems: "center",
+        // alignItems: "center",
     },
     headerContainer: {
         width: "100%",
@@ -46,6 +57,23 @@ const styles = StyleSheet.create({
         marginTop: "7%",
     },
     keyboardAvoidingContainer: {
-        flex: 1,
+        padding: 20,
+        flexDirection: "column",
     },
+    botMessageContainer: {
+        alignSelf: "flex-start",
+        backgroundColor: "#ECECDF",
+        maxWidth: "70%",
+        marginVertical: 5,
+        padding: 10,
+        borderRadius: 10,
+    },
+    userMessageContainer: {
+        alignSelf: "flex-end",
+        backgroundColor: "#DCF8C6",
+        maxWidth: "70%",
+        marginVertical: 5,
+        padding: 10,
+        borderRadius: 10,
+    }, 
 });
