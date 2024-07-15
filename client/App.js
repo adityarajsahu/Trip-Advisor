@@ -6,9 +6,21 @@ import {
     KeyboardAvoidingView,
     Platform,
     FlatList,
+    TextInput,
+    Pressable
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+
+import React, { useState } from "react";
 
 export default function App() {
+    const [messages, setMessages] = useState([]);
+    const [text, setText] = useState("");
+
+    const handleSend = () => {
+        console.log("Button Pressed");
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar style="light" />
@@ -19,17 +31,24 @@ export default function App() {
                 behavior={Platform.OS === "ios" ? "padding" : "height"}
                 style={styles.keyboardAvoidingContainer}
             >
-                <View style={styles.botMessageContainer}>
-                    <Text>Bot Message</Text>
+                <View style={styles.chatboxContainer}>
+                    <View style={styles.botMessageContainer}>
+                        <Text>Bot Message</Text>
+                    </View>
+                    <View style={styles.userMessageContainer}>
+                        <Text>User Message</Text>
+                    </View>
                 </View>
-                <View style={styles.userMessageContainer}>
-                    <Text>User Message</Text>
-                </View>
-                <View style={styles.userMessageContainer}>
-                    <Text>This setup ensures that messages are properly aligned on the left and right sides of the screen, creating a typical chat interface layout.</Text>
-                </View>
-                <View style={styles.botMessageContainer}>
-                    <Text>This setup ensures that messages are properly aligned on the left and right sides of the screen, creating a typical chat interface layout.</Text>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.textInput}
+                        value={text}
+                        onChangeText={(newText) => setText(newText)}
+                        placeholder="Type a message"
+                    />
+                    <Pressable onPress={handleSend}>
+                        <Ionicons name="send" size={36} color="gray" />
+                    </Pressable>
                 </View>
             </KeyboardAvoidingView>
         </View>
@@ -40,7 +59,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#212121",
-        // alignItems: "center",
     },
     headerContainer: {
         width: "100%",
@@ -57,8 +75,11 @@ const styles = StyleSheet.create({
         marginTop: "7%",
     },
     keyboardAvoidingContainer: {
+        flex: 1,
         padding: 20,
-        flexDirection: "column",
+    },
+    chatboxContainer: {
+        flex: 8,
     },
     botMessageContainer: {
         alignSelf: "flex-start",
@@ -75,5 +96,23 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         padding: 10,
         borderRadius: 10,
-    }, 
+    },
+    inputContainer: {
+        flex: 2,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: 10,
+        // justifyContent: "center",
+    },
+    textInput: {
+        width: "85%",
+        color: "white",
+        fontSize: 16,
+        fontWeight: "300",
+        marginVertical: 10,
+        borderColor: "gray",
+        borderWidth: 1,
+        borderRadius: 50,
+        padding: 10,
+    },
 });
