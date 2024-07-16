@@ -1,16 +1,27 @@
 from fastapi import FastAPI
+import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_community.llms import HuggingFaceEndpoint
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from decouple import config
 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 API_TOKEN = config("API_TOKEN")
 REPO_ID = "mistralai/Mixtral-8x7B-Instruct-v0.1"
 TASK = "text-generation"
-
-app = FastAPI()
 
 template = """
 You are Trip Advisor AI, a travel assistant chatbot designed to help users plan their trips and provide travel-related information. You should handle the following scenarios effectively:
@@ -88,7 +99,10 @@ def generate_response(request: UserQueryRequest):
     chat_history.append(HumanMessage(content = user_query))
 
     response = get_response(user_query, chat_history)
-    response = response.replace(user_query, "").replace("How should the AI respond?", "").replace("AI Response:", "").replace("AI:", "").replace("Chatbot response:", "").replace("Bot response:", "").replace("Bot:", "").replace("Chatbot:", "").replace("AI Assistant:", "").strip()
+    response = response.replace(user_query, "").replace("How should the AI respond?", "").replace("AI Response:", "").replace("AI:", "").replace("Chatbot response:", "").replace("Bot response:", "").replace("Bot:", "").replace("Chatbot:", "").replace("AI Assistant:", "").replace("Desired assistant response:", "").strip()
     chat_history.append(AIMessage(content = response))
 
     return {"message": response}
+
+if __name__ == "__main__":
+    uvicorn.run(app, port = 8000)

@@ -10,12 +10,28 @@ import {
     Pressable
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function App() {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
+
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const response = await fetch("https://localhost:8000/");
+                if(!response.ok) {
+                    throw new Error("Network response was not OK");
+                }
+                const data = await response.json();
+                console.log(data);
+            } catch (error) {
+                console.error("Error fetching data: ", error);
+            }
+        };
+
+        getData();
+    }, []);
 
     const handleSend = () => {
         console.log("Button Pressed");
@@ -79,7 +95,7 @@ const styles = StyleSheet.create({
         padding: 20,
     },
     chatboxContainer: {
-        flex: 8,
+        flex: 32,
     },
     botMessageContainer: {
         alignSelf: "flex-start",
@@ -98,7 +114,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
     },
     inputContainer: {
-        flex: 2,
+        flex: 7,
         flexDirection: "row",
         alignItems: "center",
         gap: 10,
