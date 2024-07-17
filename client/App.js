@@ -11,20 +11,26 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
+import * as Crypto from "expo-crypto";
 
 export default function App() {
     const [messages, setMessages] = useState([]);
     const [text, setText] = useState("");
+    const [sendButtonDisabled, setSendButtonDisabled] = useState(false);
 
     useEffect(() => {
         const getData = async () => {
             try {
-                const response = await fetch("https://localhost:8000/");
+                const response = await fetch("https://92ad-2401-4900-8829-405e-ad33-477b-e4d2-eec5.ngrok-free.app"); // Ngrok Tunneling
                 if(!response.ok) {
                     throw new Error("Network response was not OK");
                 }
                 const data = await response.json();
-                console.log(data);
+                // console.log(data);
+                let id = Crypto.randomUUID();
+                console.log(id);
+                setMessages([...messages, { id: id, text: data["message"], type: "bot" }]);
+                // console.log(messages);
             } catch (error) {
                 console.error("Error fetching data: ", error);
             }
@@ -33,8 +39,48 @@ export default function App() {
         getData();
     }, []);
 
-    const handleSend = () => {
-        console.log("Button Pressed");
+    const handleSend = async () => {
+        let user_query = text.trim();
+        setText("");
+        if(user_query) {
+            setSendButtonDisabled(true);
+            let id = Crypto.randomUUID();
+            console.log(id);
+            setMessages([...messages, { id: id, text: user_query, type: "user" }]);
+
+            try {
+                const response = await fetch("https://92ad-2401-4900-8829-405e-ad33-477b-e4d2-eec5.ngrok-free.app", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ "user_query": user_query }),
+                });
+
+                if(!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                id = Crypto.randomUUID();
+                const botMessage = { id: id, text: data["message"], type: "bot" };
+                setMessages(prevMessages => [...prevMessages, botMessage]);
+            } catch (error) {
+                console.error("Data Fetch Error: ", error);
+            }
+
+            setSendButtonDisabled(false);
+        }
+
+        console.log(messages);
+    };
+
+    const renderItem = ({ item }) => {
+        return (
+            <View style={item.type === "bot" ? styles.botMessageContainer : styles.userMessageContainer}>
+                <Text>{item.text}</Text>
+            </View>
+        );
     };
 
     return (
@@ -48,12 +94,7 @@ export default function App() {
                 style={styles.keyboardAvoidingContainer}
             >
                 <View style={styles.chatboxContainer}>
-                    <View style={styles.botMessageContainer}>
-                        <Text>Bot Message</Text>
-                    </View>
-                    <View style={styles.userMessageContainer}>
-                        <Text>User Message</Text>
-                    </View>
+                    <FlatList data={messages} renderItem={renderItem} keyExtractor={(item) => item.id.toString()} />
                 </View>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -62,8 +103,8 @@ export default function App() {
                         onChangeText={(newText) => setText(newText)}
                         placeholder="Type a message"
                     />
-                    <Pressable onPress={handleSend}>
-                        <Ionicons name="send" size={36} color="gray" />
+                    <Pressable onPress={handleSend} disabled={sendButtonDisabled}>
+                        { sendButtonDisabled ? <Ionicons name="stop-circle-outline" size={36} color="gray" /> : <Ionicons name="send" size={36} color="gray" /> }
                     </Pressable>
                 </View>
             </KeyboardAvoidingView>
